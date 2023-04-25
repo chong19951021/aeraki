@@ -26,6 +26,7 @@ type AerakiArgs struct {
 	XdsAddr            string
 	PodName            string
 	IstioConfigMapName string
+	IstioRevision      string
 	// The listening address for HTTPS (webhooks).
 	HTTPSAddr                string
 	RootNamespace            string

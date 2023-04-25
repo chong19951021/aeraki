@@ -39,6 +39,7 @@ import (
 
 const (
 	defaultIstiodAddr        = "istiod.istio-system:15010"
+	dafaultIstiodRevision    = ""
 	defaultRootNamespace     = constants.DefaultRootNamespace
 	defaultXdsAddr           = ":15010"
 	defaultElectionID        = "aeraki-controller"
@@ -53,6 +54,7 @@ func main() {
 	flag.BoolVar(&args.Master, "master", true, "Istiod xds server address")
 	flag.StringVar(&args.IstiodAddr, "istiod-address", defaultIstiodAddr, "Istiod xds server address")
 	flag.StringVar(&args.IstioConfigMapName, "istiod-configMap-name", defaultMeshConfigMapName, "Istiod configMap name")
+	flag.StringVar(&args.IstioRevision, "istiod-revision", dafaultIstiodRevision, "Istiod revision")
 	flag.StringVar(&args.RootNamespace, "root-namespace", defaultRootNamespace, "The Root Namespace of Aeraki")
 	flag.StringVar(&args.ClusterID, "cluster-id", "", "The cluster where Aeraki is deployed")
 	flag.StringVar(&args.XdsAddr, "xds-listen-address", defaultXdsAddr, "Istiod xds server port")
