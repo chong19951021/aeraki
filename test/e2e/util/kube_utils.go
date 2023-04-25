@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -136,7 +137,7 @@ func DeleteDeployment(d string, n string, kubeconfig string) error {
 
 // LabelNamespace will add a label to the kubernetes namespace
 func LabelNamespace(n, label, kubeconfig string) error {
-	if _, err := Shell("kubectl label namespace %s %s --kubeconfig=%s", n, label, kubeconfig); err != nil {
+	if _, err := Shell("kubectl label namespace %s %s --overwrite=true --kubeconfig=%s", n, label, kubeconfig); err != nil {
 		if !strings.Contains(err.Error(), "AlreadyExists") {
 			return err
 		}
@@ -240,7 +241,7 @@ func KubeDeleteContents(namespace, yamlContents string, kubeconfig string) error
 }
 
 func removeFile(path string) {
-	err := os.Remove(path)
+	err := os.RemoveAll(path)
 	if err != nil {
 		log.Errorf("Unable to remove %s: %v", path, err)
 	}
@@ -812,8 +813,17 @@ func CheckDeploymentsReady(ns string, kubeconfig string) (int, error) {
 		if len(flds) < 1 {
 			continue
 		}
+		if len(flds) > 2 {
+			notReady++
+			continue
+		}
 		if len(flds) == 1 || flds[1] == "0" { // no replicas ready
 			notReady++
+			continue
+		}
+		if _, err = strconv.Atoi(flds[1]); err != nil {
+			notReady++
+			continue
 		}
 	}
 

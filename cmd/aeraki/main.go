@@ -39,6 +39,7 @@ import (
 
 const (
 	defaultIstiodAddr        = "istiod.istio-system:15010"
+	defaultRootNamespace     = "istio-system"
 	dafaultIstiodRevision    = ""
 	defaultRootNamespace     = constants.DefaultRootNamespace
 	defaultXdsAddr           = ":15010"
@@ -52,12 +53,14 @@ const (
 func main() {
 	args := bootstrap.NewAerakiArgs()
 	flag.BoolVar(&args.Master, "master", true, "Istiod xds server address")
+	flag.StringVar(&args.AerakiXdsAddr, "aeraki-xds-address", constants.DefaultAerakiXdsAddr, "Aeraki xds server address")
+	flag.StringVar(&args.AerakiXdsPort, "aeraki-xds-port", constants.DefaultAerakiXdsPort, "Aeraki xds server port")
 	flag.StringVar(&args.IstiodAddr, "istiod-address", defaultIstiodAddr, "Istiod xds server address")
 	flag.StringVar(&args.IstioConfigMapName, "istiod-configMap-name", defaultMeshConfigMapName, "Istiod configMap name")
 	flag.StringVar(&args.IstioRevision, "istiod-revision", dafaultIstiodRevision, "Istiod revision")
+	flag.StringVar(&args.IstioConfigMapName, "istiod-configMap-name", defaultMeshConfigMapName, "Istiod configMap name")
 	flag.StringVar(&args.RootNamespace, "root-namespace", defaultRootNamespace, "The Root Namespace of Aeraki")
 	flag.StringVar(&args.ClusterID, "cluster-id", "", "The cluster where Aeraki is deployed")
-	flag.StringVar(&args.XdsAddr, "xds-listen-address", defaultXdsAddr, "Istiod xds server port")
 	flag.StringVar(&args.ConfigStoreSecret, "config-store-secret", defaultConfigStoreSecret,
 		"The secret to store the Istio kube config store, use the in cluster API server if it's not specified")
 	flag.StringVar(&args.ElectionID, "election-id", defaultElectionID, "ElectionID to elect master controller")
@@ -73,11 +76,17 @@ func main() {
 		args.ServerID = "Aeraki-" + uuid.New().String()
 	}
 
+	args.PodName = env.RegisterStringVar("POD_NAME", args.ServerID, "").Get()
+	args.RootNamespace = env.RegisterStringVar("AERAKI_NAMESPACE", args.RootNamespace, "").Get()
+	args.EnableEnvoyFilterNSScope = env.RegisterBoolVar("AERAKI_ENABLE_ENVOY_FILTER_NS_SCOPE",
+		args.EnableEnvoyFilterNSScope, "").Get()
+	args.IstiodAddr = env.RegisterStringVar("AERAKI_ISTIOD_ADDR", args.IstiodAddr, "").Get()
+	args.AerakiXdsAddr = env.RegisterStringVar("AERAKI_XDS_ADDR", constants.DefaultAerakiXdsAddr, "").Get()
+	args.AerakiXdsPort = env.RegisterStringVar("AERAKI_XDS_PORT", constants.DefaultAerakiXdsPort, "").Get()
+
 	flag.VisitAll(func(flag *flag.Flag) {
 		log.Infof("Aeraki parameter: %s: %v", flag.Name, flag.Value)
 	})
-
-	args.PodName = env.RegisterStringVar("POD_NAME", args.ServerID, "").Get()
 
 	setLogLevels(args.LogLevel)
 	// Create the stop channel for all of the servers.
@@ -85,7 +94,8 @@ func main() {
 	args.Protocols = initGenerators()
 	server, err := bootstrap.NewServer(args)
 	if err != nil {
-		log.Fatalf("Failed to start Aeraki :%v", err)
+		log.Fatalf("Failed to init Aeraki :%v", err)
+		os.Exit(1)
 	}
 	server.Start(stopChan)
 

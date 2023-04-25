@@ -23,10 +23,10 @@ import (
 type AerakiArgs struct {
 	Master             bool
 	IstiodAddr         string
-	XdsAddr            string
+	AerakiXdsAddr      string
+	AerakiXdsPort      string
 	PodName            string
 	IstioConfigMapName string
-	IstioRevision      string
 	// The listening address for HTTPS (webhooks).
 	HTTPSAddr                string
 	RootNamespace            string
