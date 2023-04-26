@@ -21,4 +21,5 @@ const (
 	DefaultAerakiXdsPort = ":15010"
 	// DefaultAerakiXdsAddr is the default value for Aeraki xds address
 	DefaultAerakiXdsAddr = "aeraki.istio-system"
+	DefaultRootNamespace = "istio-system"
 )

@@ -39,7 +39,6 @@ import (
 
 const (
 	defaultIstiodAddr        = "istiod.istio-system:15010"
-	defaultRootNamespace     = "istio-system"
 	dafaultIstiodRevision    = ""
 	defaultRootNamespace     = constants.DefaultRootNamespace
 	defaultXdsAddr           = ":15010"
