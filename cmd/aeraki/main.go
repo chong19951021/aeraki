@@ -51,7 +51,7 @@ const (
 
 func main() {
 	args := bootstrap.NewAerakiArgs()
-	flag.BoolVar(&args.Master, "master", true, "Istiod xds server address")
+	flag.BoolVar(&args.Master, "master", true, "Run as master")
 	flag.StringVar(&args.AerakiXdsAddr, "aeraki-xds-address", constants.DefaultAerakiXdsAddr, "Aeraki xds server address")
 	flag.StringVar(&args.AerakiXdsPort, "aeraki-xds-port", constants.DefaultAerakiXdsPort, "Aeraki xds server port")
 	flag.StringVar(&args.IstiodAddr, "istiod-address", defaultIstiodAddr, "Istiod xds server address")
